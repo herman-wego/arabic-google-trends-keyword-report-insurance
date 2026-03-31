@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arabic Google Trends Keyword Report — Travel Insurance</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    line-height: 1.6;
+    padding: 0;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 100%);
+    border-radius: 16px;
+    padding: 40px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #e0e7ff, #c7d2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: #a5b4fc;
+    margin-bottom: 16px;
+  }
+  .header .meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(99,102,241,0.25);
+    color: #c7d2fe;
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+  .badge.date { background: rgba(16,185,129,0.2); color: #6ee7b7; border-color: rgba(16,185,129,0.3); }
+  .badge.scope { background: rgba(245,158,11,0.2); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
+  .badge.focus { background: rgba(236,72,153,0.2); color: #f9a8d4; border-color: rgba(236,72,153,0.3); }
+
+  /* News Context */
+  .news-box {
+    background: linear-gradient(135deg, #1a1528 0%, #1e1b35 100%);
+    border: 1px solid #3b2d63;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .news-box h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .news-box h2::before { content: '📰'; }
+  .news-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(59,45,99,0.5);
+    font-size: 14px;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-item strong { color: #e0e7ff; }
+  .news-item .note { color: #94a3b8; font-size: 13px; margin-top: 2px; }
+
+  /* Stats Row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  .stat-card {
+    background: #1a1d2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #818cf8, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .num.urgent {
+    background: linear-gradient(90deg, #f87171, #fb923c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .label { font-size: 12px; color: #94a3b8; margin-top: 4px; font-weight: 500; }
+
+  /* Executive Summary */
+  .exec-summary {
+    background: linear-gradient(135deg, #172554 0%, #1e3a5f 100%);
+    border: 1px solid #1e40af;
+    border-radius: 14px;
+    padding: 22px 28px;
+    margin-bottom: 28px;
+    font-size: 14.5px;
+    color: #bfdbfe;
+    line-height: 1.7;
+  }
+  .exec-summary h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #93c5fd;
+    margin-bottom: 10px;
+  }
+
+  /* Alerts */
+  .alert {
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .alert.red {
+    background: linear-gradient(135deg, #2d1215 0%, #3b1419 100%);
+    border: 1px solid #7f1d1d;
+    color: #fca5a5;
+  }
+  .alert.amber {
+    background: linear-gradient(135deg, #2d2006 0%, #3b2a0a 100%);
+    border: 1px solid #78350f;
+    color: #fcd34d;
+  }
+  .alert .icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .alert .text strong { display: block; margin-bottom: 3px; }
+  .alerts-section { margin-bottom: 28px; }
+  .alerts-section h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fca5a5;
+    margin-bottom: 14px;
+  }
+
+  /* Keyword Cards */
+  .keywords-section { margin-bottom: 32px; }
+  .keywords-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e0e7ff;
+    margin-bottom: 18px;
+  }
+  .kw-card {
+    background: #1a1d2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kw-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .kw-card.priority-write-now::before { background: #ef4444; }
+  .kw-card.priority-audit::before { background: #ef4444; }
+  .kw-card.priority-high::before { background: #f59e0b; }
+  .kw-card.priority-medium::before { background: #6b7280; }
+  .kw-card.priority-evergreen::before { background: #6b7280; }
+
+  .kw-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .kw-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: #6366f1;
+    background: rgba(99,102,241,0.15);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .kw-arabic {
+    font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #f1f5f9;
+    direction: rtl;
+    text-align: right;
+    flex: 1;
+    min-width: 200px;
+  }
+  .kw-translit {
+    font-size: 13px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .kw-note {
+    font-size: 13.5px;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .kw-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .tag.growth-breakout { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .tag.growth-high { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+  .tag.growth-moderate { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+  .tag.growth-mild { background: rgba(107,114,128,0.2); color: #d1d5db; border: 1px solid rgba(107,114,128,0.3); }
+
+  .tag.type-crisis { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .tag.type-visa { background: rgba(168,85,247,0.15); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.2); }
+  .tag.type-insurance { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+  .tag.type-destination { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+  .tag.type-product { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+  .tag.type-seasonal { background: rgba(251,146,60,0.15); color: #fdba74; border: 1px solid rgba(251,146,60,0.2); }
+  .tag.type-provider { background: rgba(236,72,153,0.15); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.2); }
+
+  .tag.priority-write-now { background: rgba(239,68,68,0.25); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); font-weight: 700; }
+  .tag.priority-audit { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .tag.priority-high { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+  .tag.priority-medium { background: rgba(107,114,128,0.15); color: #d1d5db; border: 1px solid rgba(107,114,128,0.2); }
+  .tag.priority-evergreen { background: rgba(107,114,128,0.1); color: #9ca3af; border: 1px solid rgba(107,114,128,0.15); }
+
+  .tag.source-news { background: rgba(251,146,60,0.15); color: #fdba74; border: 1px solid rgba(251,146,60,0.2); }
+  .tag.source-trends { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); }
+
+  .kw-regions {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 8px;
+  }
+  .kw-regions strong { color: #94a3b8; }
+
+  /* Clusters */
+  .clusters-section { margin-bottom: 32px; }
+  .clusters-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e0e7ff;
+    margin-bottom: 18px;
+  }
+  .clusters-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 700px) {
+    .clusters-grid { grid-template-columns: 1fr; }
+  }
+  .cluster-card {
+    background: #1a1d2e;
+    border: 1px solid #2a2d3e;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .cluster-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #c7d2fe;
+    margin-bottom: 8px;
+  }
+  .cluster-card p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .cluster-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cluster-tag {
+    font-family: 'Noto Sans Arabic', 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.2);
+    color: #a5b4fc;
+    direction: rtl;
+  }
+  .cluster-tag .growth {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #fcd34d;
+    margin-right: 4px;
+    direction: ltr;
+    display: inline;
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid #2a2d3e;
+    padding-top: 20px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.8;
+  }
+  .footer strong { color: #94a3b8; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Arabic Google Trends Keyword Report</h1>
+    <p class="subtitle">Wego Blog — Rising Arabic-language travel insurance queries you should write about</p>
+    <div class="meta">
+      <span class="badge date">📅 31 March 2026</span>
+      <span class="badge scope">🌍 Worldwide (Arabic language)</span>
+      <span class="badge focus">🛡️ Focus: Travel Insurance</span>
+      <span class="badge">Keywords shown in Arabic script with transliterations</span>
+    </div>
+  </div>
+
+  <!-- News Context -->
+  <div class="news-box">
+    <h2>News Context Driving Arabic Travel Insurance Search Demand</h2>
+
+    <div class="news-item">
+      <strong>Iran conflict triggers massive flight cancellations across the Middle East</strong>
+      <div class="note">US-Israel military strikes on Iran (28 Feb 2026) caused 23,000+ flight cancellations, airspace closures across the Gulf. Arabic speakers worldwide are searching for insurance coverage, refund rights, and rebooking help. Emirates and Qatar Airways suspended operations.</div>
+    </div>
+
+    <div class="news-item">
+      <strong>War exclusions exposed in travel insurance policies</strong>
+      <div class="note">Standard travel insurance policies broadly exclude war-related claims. Arabic media is running stories about the "insurance gap" — travelers stranded without coverage. CFAR (Cancel for Any Reason) demand surged 27% since early March.</div>
+    </div>
+
+    <div class="news-item">
+      <strong>Saudi Arabia travel insurance requirements for tourists</strong>
+      <div class="note">Health insurance is mandatory for Saudi tourist visa holders. Rising demand from Egyptians and other Arab nationals applying for Saudi e-visas is driving "تأمين السفر" searches, particularly involving Al Rajhi Bank and Tawuniya Insurance products.</div>
+    </div>
+
+    <div class="news-item">
+      <strong>Schengen visa insurance demand remains elevated</strong>
+      <div class="note">The EU's new e-Schengen visa system rollout (2025–2026) and ETIAS launch are keeping Schengen travel insurance queries high among Arabic speakers applying from Gulf states, Egypt, Jordan, and the diaspora.</div>
+    </div>
+
+    <div class="news-item">
+      <strong>Arab Travel Market 2026 postponed from May to August</strong>
+      <div class="note">The flagship travel trade show in Dubai was pushed back due to regional instability, reflecting broader travel uncertainty in the MENA region that is fueling insurance-related searches.</div>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num urgent">5</div>
+      <div class="label">Urgent Keywords</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">18</div>
+      <div class="label">Total Arabic Keywords</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">5</div>
+      <div class="label">Thematic Clusters</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">12</div>
+      <div class="label">News-Derived Discoveries</div>
+    </div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="exec-summary">
+    <h2>Executive Summary</h2>
+    <p>The Iran conflict has created an unprecedented spike in Arabic travel insurance search demand. The dominant theme is crisis-driven: Arabic speakers are searching for war exclusion information, CFAR policies, and how to get refunds for cancelled flights. Google Trends data shows breakout-level interest for Al Rajhi Bank, Spain (as an alternative destination), Egyptians (as a demographic searching for insurance), and the Schengen area — all in the context of "تأمين السفر" (travel insurance). The biggest content opportunity is an authoritative Arabic guide explaining what travel insurance does and does not cover during the current conflict, combined with practical advice on CFAR policies and mandatory insurance requirements for popular visa destinations. Wego should prioritize Arabic crisis-insurance content immediately, while also building evergreen Arabic guides for Schengen and Saudi visa insurance.</p>
+  </div>
+
+  <!-- Time-Sensitive Alerts -->
+  <div class="alerts-section">
+    <h2>⚡ Time-Sensitive Alerts</h2>
+
+    <div class="alert red">
+      <span class="icon">🚨</span>
+      <div class="text">
+        <strong>PUBLISH NOW: Arabic guide on travel insurance and war exclusions</strong>
+        Arabic speakers are discovering their travel insurance doesn't cover war-related disruptions. No authoritative Arabic-language guide exists explaining what is and isn't covered. First-mover advantage is massive.
+      </div>
+    </div>
+
+    <div class="alert red">
+      <span class="icon">🚨</span>
+      <div class="text">
+        <strong>PUBLISH NOW: "تأمين إلغاء الرحلة لأي سبب" (CFAR) Arabic guide</strong>
+        CFAR demand has surged 27% globally. Arabic content about Cancel For Any Reason insurance is virtually nonexistent. This is a high-value, low-competition keyword.
+      </div>
+    </div>
+
+    <div class="alert amber">
+      <span class="icon">⚠️</span>
+      <div class="text">
+        <strong>AUDIT: Existing Arabic travel insurance content</strong>
+        If Wego/Rahhal has existing Arabic travel insurance articles, they likely don't address the current conflict context. Audit and update with war exclusion information and CFAR alternatives.
+      </div>
+    </div>
+
+    <div class="alert amber">
+      <span class="icon">⚠️</span>
+      <div class="text">
+        <strong>HIGH PRIORITY: Schengen visa insurance guide in Arabic</strong>
+        Schengen-related travel insurance queries are up +300% in the past 7 days. With ETIAS launching and e-visa changes, a comprehensive Arabic Schengen insurance guide would capture significant demand.
+      </div>
+    </div>
+  </div>
+
+  <!-- Prioritized Keywords -->
+  <div class="keywords-section">
+    <h2>📊 Prioritized Arabic Keywords</h2>
+
+    <!-- 1 -->
+    <div class="kw-card priority-write-now">
+      <div class="kw-header">
+        <div class="kw-rank">1</div>
+        <div class="kw-arabic">تأمين السفر والحرب</div>
+      </div>
+      <div class="kw-translit">ta'min al-safar wal-harb — "travel insurance and war"</div>
+      <div class="kw-note">Arabic speakers are frantically searching whether their travel insurance covers war-related flight cancellations and stranding. This is the #1 content gap right now. Write a comprehensive Arabic guide explaining war exclusions, what IS covered (airline rebooking obligations, EU261 rights), and CFAR alternatives.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-crisis">Crisis / Insurance</span>
+        <span class="tag priority-write-now">Write Now</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, AE, EG, KW, QA, DE, UK</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="kw-card priority-write-now">
+      <div class="kw-header">
+        <div class="kw-rank">2</div>
+        <div class="kw-arabic">تأمين إلغاء الرحلة لأي سبب</div>
+      </div>
+      <div class="kw-translit">ta'min ilgha' al-rihla li-ayy sabab — "cancel for any reason insurance"</div>
+      <div class="kw-note">CFAR insurance demand surged 27% globally since the Iran strikes. Arabic content about CFAR is virtually nonexistent. Write an Arabic explainer covering what CFAR is, how it differs from standard cancellation coverage, costs (typically 40-60% premium increase), and which providers offer it. This term also captures "تأمين الإلغاء" (cancellation insurance) searches.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-write-now">Write Now</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, AE, EG, JO, DE, UK, US</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="kw-card priority-write-now">
+      <div class="kw-header">
+        <div class="kw-rank">3</div>
+        <div class="kw-arabic">تأمين السفر التعاونية</div>
+      </div>
+      <div class="kw-translit">ta'min al-safar al-ta'awuniyya — "Tawuniya travel insurance"</div>
+      <div class="kw-note">Google Trends rising query (+50% in 7 days). Tawuniya (التعاونية) is Saudi Arabia's largest insurance provider. Saudi travelers are searching for how to purchase travel insurance through Tawuniya, especially for Schengen visas and outbound travel during the regional crisis. Write an Arabic guide covering Tawuniya travel insurance plans, coverage details, pricing, and how to buy online.</div>
+      <div class="kw-tags">
+        <span class="tag growth-moderate">+50%</span>
+        <span class="tag type-provider">Insurance Provider</span>
+        <span class="tag priority-write-now">Write Now</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="kw-card priority-write-now">
+      <div class="kw-header">
+        <div class="kw-rank">4</div>
+        <div class="kw-arabic">تأمين السفر لتأشيرة شنغن</div>
+      </div>
+      <div class="kw-translit">ta'min al-safar li-tashirat shinghun — "travel insurance for Schengen visa"</div>
+      <div class="kw-note">Google Trends shows "منطقة شنغن" (Schengen area) as a rising topic (+300%) in the context of travel insurance. Mandatory €30,000 minimum medical coverage is required. With the e-Schengen visa rollout and ETIAS changes in 2026, Arabic speakers need a definitive guide. Cover requirements, approved providers, cost comparisons, and how to buy online from Arab countries.</div>
+      <div class="kw-tags">
+        <span class="tag growth-high">+300%</span>
+        <span class="tag type-visa">Visa / Insurance</span>
+        <span class="tag priority-write-now">Write Now</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> EG, SA, AE, DZ, JO, MA, IQ</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="kw-card priority-audit">
+      <div class="kw-header">
+        <div class="kw-rank">5</div>
+        <div class="kw-arabic">مصرف الراجحي تأمين سفر</div>
+      </div>
+      <div class="kw-translit">masraf al-rajhi ta'min safar — "Al Rajhi Bank travel insurance"</div>
+      <div class="kw-note">Google Trends shows Al Rajhi Bank as a breakout rising topic for "تأمين السفر". Saudi travelers are searching for travel insurance through Al Rajhi, one of the largest Islamic banks. This reflects the trend of buying insurance bundled with banking products. Write a comparison or guide specifically for Al Rajhi travel insurance products.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-provider">Insurance Provider</span>
+        <span class="tag priority-audit">Audit</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">6</div>
+        <div class="kw-arabic">هل تأمين السفر يغطي إلغاء الرحلات بسبب الحرب</div>
+      </div>
+      <div class="kw-translit">hal ta'min al-safar yughatty ilgha' al-rihlat bi-sabab al-harb — "does travel insurance cover war-related flight cancellations"</div>
+      <div class="kw-note">Long-tail question query that Arabic speakers are asking right now. This is the exact question millions of stranded travelers have. Optimize content with this question as an H2 or FAQ section. Address the gap between what travelers expect and what policies actually cover during armed conflict.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-crisis">Crisis / Insurance</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, AE, EG, KW, QA, BH, JO</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">7</div>
+        <div class="kw-arabic">تأمين سفر للمصريين</div>
+      </div>
+      <div class="kw-translit">ta'min safar lil-masriyyin — "travel insurance for Egyptians"</div>
+      <div class="kw-note">Google Trends shows "مصريون" (Egyptians) as a breakout rising topic for travel insurance. Egyptian travelers are a major demographic searching in Arabic for travel insurance, especially for Schengen, Saudi, and UAE visas. Write a targeted guide for Egyptian travelers covering the best insurance providers available in Egypt, pricing in EGP, and visa-specific requirements.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> EG, SA, AE, KW</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">8</div>
+        <div class="kw-arabic">تأمين سفر إلزامي دول</div>
+      </div>
+      <div class="kw-translit">ta'min safar ilzami duwal — "mandatory travel insurance countries"</div>
+      <div class="kw-note">Timely keyword as more countries enforce mandatory travel insurance in 2026. Write a comprehensive Arabic list of all countries requiring travel insurance (Schengen, UAE, Saudi Arabia, Turkey, Cuba, Russia, Thailand, Nepal, Ecuador, etc.) with minimum coverage amounts and how to buy for each destination.</div>
+      <div class="kw-tags">
+        <span class="tag growth-high">+250%</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, JO, IQ, DZ</div>
+    </div>
+
+    <!-- 9 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">9</div>
+        <div class="kw-arabic">تأمين السفر لإسبانيا</div>
+      </div>
+      <div class="kw-translit">ta'min al-safar li-isbanya — "travel insurance for Spain"</div>
+      <div class="kw-note">Google Trends shows "إسبانيا" (Spain) as a breakout rising topic for travel insurance. Spain is a top Schengen destination for Arab travelers and requires mandatory insurance. With summer approaching, Arabic speakers are preparing visa applications. Write a destination-specific Arabic insurance guide for Spain covering Schengen requirements and recommended providers.</div>
+      <div class="kw-tags">
+        <span class="tag growth-breakout">Breakout</span>
+        <span class="tag type-destination">Destination / Visa</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, MA, DZ</div>
+    </div>
+
+    <!-- 10 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">10</div>
+        <div class="kw-arabic">حقوق المسافرين عند إلغاء الرحلات</div>
+      </div>
+      <div class="kw-translit">huquq al-musafirin 'ind ilgha' al-rihlat — "passenger rights when flights are cancelled"</div>
+      <div class="kw-note">Closely related to travel insurance — Arabic speakers affected by the Iran conflict flight cancellations are searching for their rights. Cover airline obligations (rebooking, meals, accommodation), EU261 compensation rights, and when travel insurance kicks in vs. airline responsibility. This bridges the crisis content and insurance content.</div>
+      <div class="kw-tags">
+        <span class="tag growth-high">+400%</span>
+        <span class="tag type-crisis">Crisis / Rights</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> AE, SA, QA, KW, EG, BH, JO</div>
+    </div>
+
+    <!-- 11 -->
+    <div class="kw-card priority-high">
+      <div class="kw-header">
+        <div class="kw-rank">11</div>
+        <div class="kw-arabic">أفضل تأمين سفر</div>
+      </div>
+      <div class="kw-translit">afdal ta'min safar — "best travel insurance"</div>
+      <div class="kw-note">Evergreen keyword with strong crisis-driven uplift. Arabic speakers searching for "best travel insurance" are comparing providers. Write a comparison/ranking article in Arabic covering the top travel insurance companies available to Arab travelers (Tawuniya, Al Rajhi, Allianz, AXA, GIG Gulf) with pricing, coverage, and online purchase links.</div>
+      <div class="kw-tags">
+        <span class="tag growth-high">+200%</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-high">High Priority</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, KW, JO, IQ</div>
+    </div>
+
+    <!-- 12 -->
+    <div class="kw-card priority-medium">
+      <div class="kw-header">
+        <div class="kw-rank">12</div>
+        <div class="kw-arabic">شركة التعاونية للتأمين سفر</div>
+      </div>
+      <div class="kw-translit">sharikat al-ta'awuniyya lil-ta'min safar — "Tawuniya Insurance Company travel"</div>
+      <div class="kw-note">Google Trends rising topic (+150%). The corporate entity "شركة التعاونية للتأمين" is being searched alongside travel insurance. This is the brand-name variant of keyword #3. Can be captured in the same article or a dedicated brand comparison page.</div>
+      <div class="kw-tags">
+        <span class="tag growth-moderate">+150%</span>
+        <span class="tag type-provider">Insurance Provider</span>
+        <span class="tag priority-medium">Medium</span>
+        <span class="tag source-trends">Google Trends</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA</div>
+    </div>
+
+    <!-- 13 -->
+    <div class="kw-card priority-medium">
+      <div class="kw-header">
+        <div class="kw-rank">13</div>
+        <div class="kw-arabic">تأمين سفر أون لاين</div>
+      </div>
+      <div class="kw-translit">ta'min safar onlain — "travel insurance online"</div>
+      <div class="kw-note">Arabic speakers searching for online purchase options. The crisis has accelerated the shift to online insurance buying. Cover how to buy travel insurance online from Arab countries, comparison of online platforms, and step-by-step purchase guides for popular providers.</div>
+      <div class="kw-tags">
+        <span class="tag growth-moderate">+180%</span>
+        <span class="tag type-product">Product / How-to</span>
+        <span class="tag priority-medium">Medium</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, JO</div>
+    </div>
+
+    <!-- 14 -->
+    <div class="kw-card priority-medium">
+      <div class="kw-header">
+        <div class="kw-rank">14</div>
+        <div class="kw-arabic">تأمين السفر للسعوديين</div>
+      </div>
+      <div class="kw-translit">ta'min al-safar lil-sa'udiyyin — "travel insurance for Saudis"</div>
+      <div class="kw-note">Saudi nationals are a key demographic. With Saudi Arabia's outbound tourism boom and Vision 2030, more Saudis are traveling internationally and need insurance. Write a guide tailored to Saudi travelers covering where insurance is mandatory, best Saudi providers, and how to claim.</div>
+      <div class="kw-tags">
+        <span class="tag growth-moderate">+120%</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-medium">Medium</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA</div>
+    </div>
+
+    <!-- 15 -->
+    <div class="kw-card priority-medium">
+      <div class="kw-header">
+        <div class="kw-rank">15</div>
+        <div class="kw-arabic">تأمين طبي للسفر</div>
+      </div>
+      <div class="kw-translit">ta'min tibbi lil-safar — "medical insurance for travel"</div>
+      <div class="kw-note">Core evergreen term with crisis uplift. Medical coverage is the most-searched aspect of travel insurance. An Arabic guide should explain what medical travel insurance covers, minimum requirements by destination, emergency evacuation coverage, and pre-existing conditions.</div>
+      <div class="kw-tags">
+        <span class="tag growth-moderate">+100%</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-medium">Medium</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, IQ, JO, DZ</div>
+    </div>
+
+    <!-- 16 -->
+    <div class="kw-card priority-evergreen">
+      <div class="kw-header">
+        <div class="kw-rank">16</div>
+        <div class="kw-arabic">سعر تأمين السفر</div>
+      </div>
+      <div class="kw-translit">si'r ta'min al-safar — "travel insurance price"</div>
+      <div class="kw-note">Price-focused query. Arabic speakers want to know costs before buying. Create a pricing comparison article covering travel insurance costs by destination, trip length, and coverage level. Include approximate prices in SAR, AED, and EGP for relatability.</div>
+      <div class="kw-tags">
+        <span class="tag growth-mild">+80%</span>
+        <span class="tag type-insurance">Insurance Guide</span>
+        <span class="tag priority-evergreen">Evergreen</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, EG, AE, KW, JO</div>
+    </div>
+
+    <!-- 17 -->
+    <div class="kw-card priority-evergreen">
+      <div class="kw-header">
+        <div class="kw-rank">17</div>
+        <div class="kw-arabic">تأمين سفر تركيا</div>
+      </div>
+      <div class="kw-translit">ta'min safar turkiya — "travel insurance Turkey"</div>
+      <div class="kw-note">Turkey is a top destination for Arab travelers. While not always mandatory, travel insurance is increasingly recommended. Create an Arabic guide for Turkey-bound travelers covering visa requirements, recommended coverage levels, and the best providers.</div>
+      <div class="kw-tags">
+        <span class="tag growth-mild">+70%</span>
+        <span class="tag type-destination">Destination</span>
+        <span class="tag priority-evergreen">Evergreen</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, IQ, EG, JO, KW</div>
+    </div>
+
+    <!-- 18 -->
+    <div class="kw-card priority-evergreen">
+      <div class="kw-header">
+        <div class="kw-rank">18</div>
+        <div class="kw-arabic">كيف اطلع تأمين سفر</div>
+      </div>
+      <div class="kw-translit">kayf atla' ta'min safar — "how do I get travel insurance"</div>
+      <div class="kw-note">Colloquial/Gulf Arabic query from first-time insurance buyers. This captures the beginner segment — travelers who've never bought insurance before but now feel they need to. A step-by-step Arabic beginner's guide would rank well and serve a large audience.</div>
+      <div class="kw-tags">
+        <span class="tag growth-mild">+60%</span>
+        <span class="tag type-product">How-to</span>
+        <span class="tag priority-evergreen">Evergreen</span>
+        <span class="tag source-news">News-derived</span>
+      </div>
+      <div class="kw-regions"><strong>Top regions:</strong> SA, AE, KW, QA, BH</div>
+    </div>
+  </div>
+
+  <!-- Thematic Clusters -->
+  <div class="clusters-section">
+    <h2>🔗 Thematic Clusters</h2>
+    <div class="clusters-grid">
+
+      <div class="cluster-card">
+        <h3>🔴 Crisis & War Exclusions</h3>
+        <p>Arabic content about what travel insurance covers (and doesn't) during the Iran conflict. Highest urgency — publish immediately.</p>
+        <div class="cluster-tags">
+          <span class="cluster-tag">تأمين السفر والحرب <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">هل تأمين السفر يغطي الحرب <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">تأمين إلغاء لأي سبب <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">حقوق المسافرين إلغاء رحلات <span class="growth">+400%</span></span>
+        </div>
+      </div>
+
+      <div class="cluster-card">
+        <h3>🏦 Saudi Insurance Providers</h3>
+        <p>Saudi travelers searching for travel insurance through their banks and national insurers. Strong brand-query opportunity.</p>
+        <div class="cluster-tags">
+          <span class="cluster-tag">تأمين السفر التعاونية <span class="growth">+50%</span></span>
+          <span class="cluster-tag">مصرف الراجحي تأمين <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">شركة التعاونية للتأمين <span class="growth">+150%</span></span>
+          <span class="cluster-tag">تأمين السفر للسعوديين <span class="growth">+120%</span></span>
+        </div>
+      </div>
+
+      <div class="cluster-card">
+        <h3>🇪🇺 Schengen & Visa Insurance</h3>
+        <p>Mandatory insurance for Schengen visas drives steady Arabic demand. E-Schengen and ETIAS changes create fresh content angles.</p>
+        <div class="cluster-tags">
+          <span class="cluster-tag">تأمين شنغن <span class="growth">+300%</span></span>
+          <span class="cluster-tag">تأمين السفر لإسبانيا <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">تأمين سفر إلزامي <span class="growth">+250%</span></span>
+        </div>
+      </div>
+
+      <div class="cluster-card">
+        <h3>🇪🇬 Egyptian Traveler Segment</h3>
+        <p>Egyptians are a breakout demographic for travel insurance searches — driven by visa applications to Saudi, Schengen, and UAE.</p>
+        <div class="cluster-tags">
+          <span class="cluster-tag">تأمين سفر للمصريين <span class="growth">Breakout</span></span>
+          <span class="cluster-tag">تأمين سفر أون لاين <span class="growth">+180%</span></span>
+          <span class="cluster-tag">سعر تأمين السفر <span class="growth">+80%</span></span>
+        </div>
+      </div>
+
+      <div class="cluster-card">
+        <h3>📚 Evergreen Insurance Guides</h3>
+        <p>Foundational Arabic content about travel insurance basics, pricing, and how-to guides. Lower urgency but strong long-term SEO value.</p>
+        <div class="cluster-tags">
+          <span class="cluster-tag">أفضل تأمين سفر <span class="growth">+200%</span></span>
+          <span class="cluster-tag">تأمين طبي للسفر <span class="growth">+100%</span></span>
+          <span class="cluster-tag">كيف اطلع تأمين سفر <span class="growth">+60%</span></span>
+          <span class="cluster-tag">تأمين سفر تركيا <span class="growth">+70%</span></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <strong>Data source:</strong> Google Trends (trends.google.com) + Arabic news intelligence scan<br>
+    <strong>Research date:</strong> 31 March 2026<br>
+    <strong>Time windows:</strong> 7-day (news-derived keywords) and 90-day (standard keywords)<br>
+    <strong>Scope:</strong> Arabic-language queries worldwide (MENA + diaspora) — no geographic restriction applied<br>
+    <strong>Focus:</strong> Travel insurance keywords only<br>
+    <strong>Note:</strong> Research focused on Arabic-language queries worldwide (MENA + diaspora). Growth percentages from Google Trends indicate relative increase in search volume. "Breakout" indicates 5,000%+ growth.
+  </div>
+
+</div>
+</body>
+</html>
